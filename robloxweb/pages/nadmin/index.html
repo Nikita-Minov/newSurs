@@ -1,0 +1,391 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <script src="/files/iziToast.min.js"></script>
+    <link rel="stylesheet" href="/files/iziToast.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap');
+
+        .iziToast>.iziToast-body .iziToast-icon {
+            display: flex;
+        }
+
+        body, html {
+            background: #222222
+        }
+        body {
+            margin: 0;
+            padding: 45px 90px;
+        }
+        * {
+            font-family: Inter;
+        }
+
+        .top {
+            font-weight: 700;
+            font-size: 60px;
+            color: #fff;
+            margin-bottom: 35px;
+        }
+        .rowBetween {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .button {
+            width: 145px;
+            height: 30px;
+            font-weight: 700;
+            font-size: 16px;
+            background: #fff;
+            color: #000;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            transition-duration: .3s;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .button:disabled {
+            background: #AFAFAF;
+        }
+        .red {
+            color: #fff;
+            background-color: #FF4949;
+        }
+        .red:hover {
+            background-color: #c23636;
+        }
+
+        .green {
+            color: #fff;
+            background-color: #58EA67;
+        }
+        .green:hover {
+            background-color: #43b64f;
+        }
+        .yellow {
+            color: #fff;
+            background-color: #FFCC49;
+        }
+        .yellow:hover {
+            background-color: #c09b39;
+        }
+        .selector-out {
+            display: flex;
+        }
+        .selector-out > .button {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .selector-input {
+            width: 55px;
+            height: 30px;
+
+            background: #333333;
+            border: 1px solid #FFFFFF;
+            border-radius: 0px 5px 5px 0px;
+            outline: none;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .selector-input:disabled {
+            border-color: #AFAFAF;
+        }
+        .sep {
+            width: 100%;
+            height: 1px;
+            background-color: #fff;
+            margin: 30px 0;
+        }
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .checkmark {
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: 2px solid #FFFFFF;
+            border-radius: 5px;
+            transition-duration: .3s;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .checkmark.active {
+            background-color: #FFFFFF;
+        }
+        .topup {
+            display: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            position: fixed;
+            background-color: rgba(255, 255, 255, .2);
+            backdrop-filter: blur(15px);
+
+            justify-content: center;
+            align-items: center;
+        }
+        .topup.active {
+            display: flex;
+        }
+        .topup-in {
+            background: #222222;
+            border-radius: 10px;
+            box-sizing: border-box;
+            padding: 30px;
+            gap: 30px;
+            display: flex;
+
+            flex-direction: column;
+            align-items: center;
+        }
+        .h {
+            font-weight: 700;
+            font-size: 30px;
+            color: #fff;
+        }
+        .ta {
+            resize: none;
+            width: 440px;
+            height: 245px;
+            background: #333333;
+            border: 1px solid #FFFFFF;
+            border-radius: 10px;
+            padding: 15px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+            outline: none;
+        }
+        .bb {
+            background: #FFFFFF;
+            border-radius: 10px;
+            outline: none;
+            border: none;
+            font-weight: 700;
+            font-size: 22px;
+            color: #000;
+            width: 440px;
+            height: 50px;
+            cursor: pointer;
+            transition-duration: .3s;
+        }
+        .bb:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+<div class="top">Cookies</div>
+<div class="rowBetween">
+    <div class="rowBetween" style="width: 355px;">
+        <button class="button" onclick="selectAll()">Выбрать всё</button>
+        <div class="selector-out">
+            <button class="button" onclick="selectLte()">Выбрать <=</button>
+            <input class="selector-input" value="0" id="select-lte">
+        </div>
+    </div>
+    <div class="rowBetween" style="width: 455px;">
+        <button class="button red" onclick="del(selected)">Удалить</button>
+        <button class="button yellow" onclick="update()">Обновить</button>
+        <button class="button green" onclick="toggleInsert(true)">Добавить</button>
+    </div>
+</div>
+<div class="sep"></div>
+<div class="column"></div>
+<div class="topup">
+    <div class="topup-in">
+        <div class="h">Добавление</div>
+        <textarea class="ta" placeholder="Вводите каждый куки с новой строки"></textarea>
+        <button class="bb" onclick="insert()">Добавить</button>
+    </div>
+</div>
+<script>
+
+    let cookies = [];
+    let selected = [];
+    let cCont = document.querySelector(".column");
+    let cInp = document.querySelector(".ta");
+    getCookies();
+
+    let selectLteInp = document.querySelector("#select-lte");
+    selectLteInp.addEventListener("input", (e) => {
+       e.target.value = parseInt(e.target.value) || 0;
+    });
+
+    function toggleInsert(n) {
+        document.querySelector(".topup").classList[n ? "add" : 'remove']("active");
+    }
+
+    function update() {
+        let c = "a" + Date.now();
+        iziToast.success({ message: "Успешно. Ожидаем проверку всех куки.", timeout: false, close: false, class: c });
+        fetch("/nadmin/cookies/update", {
+            headers: {
+                authorization: localStorage.getItem("nadminToken"),
+                'content-type': "application/json"
+            }
+        }).then(r => r.json()).then(r => {
+            iziToast.hide({}, document.querySelector("." + c));
+            if(!r?.ok) return iziToast.error({ message: r.error });
+            iziToast.success({ message: "Успешно. Куки добавлены" });
+            getCookies();
+        })
+    }
+
+    function profile(i) {
+        window.open(`https://www.roblox.com/users/${cookies[i].id}/profile`, "blank");
+    }
+
+    function copy(i) {
+        try {
+            navigator.clipboard.writeText(cookies[i].cookie);
+            iziToast.success({ message: "Скопировано" });
+        } catch {
+            iziToast.error({ message: "Не удалось скопировать" });
+        }
+    }
+
+    function updateCookies(){
+        cCont.innerHTML = "";
+        document.querySelector(".top").innerText = `Cookies ${cookies.length} | R$ ${cookies.map(e => e.balance).reduce((a, b) => a + b, 0)}`;
+        cookies.forEach((c, i) => {
+           cCont.innerHTML += `
+    <div class="rowBetween">
+        <div class="rowBetween" style="width: 340px;">
+            <button id="cm${i}" class="checkmark" onclick="toggle('${i}')">
+                <svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.88341 11.5945C7.34381 12.1352 6.46896 12.1352 5.92937 11.5945C5.38977 11.0538 5.38977 10.1771 5.92937 9.63641L15.1413 0.405528C15.6809 -0.135176 16.5557 -0.135176 17.0953 0.405529C17.6349 0.946233 17.6349 1.82289 17.0953 2.36359L7.88341 11.5945Z" fill="#222222"/>
+                    <path d="M7.88341 9.63641C8.423 10.1771 8.423 11.0538 7.88341 11.5945C7.34381 12.1352 6.46896 12.1352 5.92937 11.5945L0.904695 6.55945C0.365102 6.01874 0.365102 5.14209 0.904695 4.60138C1.44429 4.06068 2.31914 4.06068 2.85873 4.60138L7.88341 9.63641Z" fill="#222222"/>
+                </svg>
+            </button>
+            <button class="button red" onclick="del(\[${i}\])">Удалить</button>
+            <button class="button" onclick="copy('${i}')">Скопировать</button>
+        </div>
+        <div class="rowBetween" style="width: 420px;">
+            <button class="button" onclick="profile('${i}')">Профиль</button>
+            <div class="selector-out">
+                <button class="button" disabled>Баланс</button>
+                <input class="selector-input" style="width: 120px;" disabled value="${c.balance - c.withoutReserved}/${c.balance}" disabled>
+            </div>
+        </div>
+    </div>
+           `;
+        });
+    }
+
+    function toggle(i) {
+        let el = document.querySelector("#cm" + i);
+        if(el.classList.contains("active")) {
+            selected = selected.filter(e => e != i);
+            el.classList.remove("active");
+        } else {
+            selected.push(i);
+            el.classList.add("active");
+        }
+    }
+
+    function insert() {
+        let nC = cInp.value.split("\n").map(e => e.trim()).filter(e => e.length > 0);
+        toggleInsert(false);
+        if(nC < 1) {
+            iziToast.info({ message: "Введите куки" });
+            return;
+        }
+        fetch("/nadmin/cookies", {
+            method: "PUT",
+            headers: {
+                authorization: localStorage.getItem("nadminToken"),
+                'content-type': "application/json"
+            },
+            body: JSON.stringify(nC)
+        }).then(r => r.json()).then(r => {
+            if(!r?.ok) return iziToast.error({ message: r.error });
+            iziToast.success({ message: "Успешно. Куки будут добавлены в течении 5-и минут" });
+            getCookies();
+        })
+
+    }
+
+    function selectLte() {
+        let num = parseInt(selectLteInp.value.trim());
+
+        cookies.forEach((c, i) => {
+           if(c.balance <= num && !selected.includes(i)) {
+               selected.push(i);
+               document.querySelector("#cm" + i).classList.add("active");
+           }
+        });
+    }
+
+    function selectAll() {
+        let on = selected.length !== cookies.length;
+        selected = [];
+        for(let i = 0; i < cookies.length; i++) {
+            if(on) selected.push(i);
+            document.querySelector("#cm" + i).classList[on ? "add" : "remove"]("active");
+        }
+    }
+
+    function del(arr) {
+        fetch("/nadmin/cookies", {
+            method: "DELETE",
+            headers: {
+                authorization: localStorage.getItem("nadminToken"),
+                'content-type': "application/json"
+            },
+            body: JSON.stringify(arr.map(e => cookies[e].cookie))
+        }).then(r => r.json()).then(r => {
+            if(!r?.ok) return iziToast.error({ message: r.error });
+            iziToast.success({ message: "Успешно" });
+            getCookies();
+        })
+    }
+
+    function getCookies() {
+       fetch("/nadmin/cookies", {
+           headers: { authorization: localStorage.getItem("nadminToken") }
+       }).then(r => r.json()).then(r => {
+           if(!r?.ok) {
+               if(r?.error == "Не авторизован") auth();
+               return;
+           }
+
+           cookies = r.data.sort((a, b) => b.balance - a.balance);
+           updateCookies();
+       });
+    }
+
+    function auth(q = "Введите пароль") {
+       let pass = prompt(q);
+       fetch("/nadmin/auth", {
+           method: "post",
+           headers: { 'content-type': 'application/json' },
+           body: JSON.stringify({ password: pass })
+       }).then(r => r.json()).then(r => {
+          if(!r?.ok) {
+              if(r?.error) auth(r.error);
+              else auth("Произошла ошибка. Попробуйте ещё раз")
+          }
+          localStorage.setItem("nadminToken", r.token);
+          getCookies();
+       });
+
+    }
+
+</script>
+</body>
+</html>

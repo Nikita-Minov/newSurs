@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Админка</title>
+    <link rel="stylesheet" href="/files/iziToast.min.css" />
+    <style>
+      [data-role] > div {
+        border: 1px solid gray;
+        width: 400px;
+        padding: 10px;
+      }
+      p,
+      h3 {
+        margin: 0;
+      }
+      button {
+        padding: 10px;
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Заказы трансфером</h1>
+    <div data-role="transfer">
+      <p>Загрузка...</p>
+    </div>
+    <h1>Заказы через группу</h1>
+    <div data-role="group">
+      <p>Загрузка...</p>
+    </div>
+    <h2>Конфигурация</h2>
+    <div data-role="config">
+      <p>Загрузка...</p>
+    </div>
+    <input type="button" id="saveConfig" value="Сохранить" />
+
+    <h2 style="margin-top:10px;">Промокоды</h2>
+    <p id="notSaved" style="display:none;color:red;font-weight:bold;">Не сохранено!</p>
+    <div data-role="promocodes"></div>
+    <button id="addPromocode">Добавить</button>
+    <input type="button" id="savePromocodes" value="Сохранить" />
+    <button style="margin-top:10px" id="notify">Оповестить о поступлении</button>
+    <label for="toggleAutoGroup">Авто-пополнение группы <input type="checkbox" id="toggleAutoGroup"/></label>
+    <script
+      src="/files/iziToast.min.js"
+    ></script>
+    <script>
+let promocodesObj;
+function groupBy(arr, property) {
+  return arr.reduce(function(memo, x) {
+    if (!memo[x[property]]) { memo[x[property]] = []; }
+    memo[x[property]].push(x);
+    return memo;
+  }, {});
+}
+const getFormData = (props) => {
+        const form = {};
+        form.password = localStorage.getItem("password");
+        if (props) {
+          for (const key in props) {
+            form[key] = props[key];
+          }
+        }
+        return JSON.stringify(form);
+      };
+      const toggleDone = (id) => {
+        const order = document.querySelector(`[data-id="${id}"]`);
+        fetch("/admin/toggledone", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: getFormData({ id }),
+        })
+          .then((res) => res.json())
+          .then((response) => {
+            order.querySelector("button").innerText = response.done
+              ? "🕒"
+              : "✅";
+          });
+      };
+      const copyLink = (placeID) => {
+        navigator.clipboard
+          .writeText(`https://www.roblox.com/games/${placeID}/`)
+          .then(() => iziToast.show({ message: "Скопировано." }))
+          .catch((err) => iziToast.error({ message: err }));
+      };
+      const deleteOrder = (id) => {
+        const order = document.querySelector(`[data-id="${id}"]`);
+        fetch("/admin", {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: getFormData({ id }),
+        }).then((response) => {
+          order.remove();
+          const orders = document.querySelector('[data-role="orders"]');
+          if (orders?.childElementCount === 0) {
+            orders.innerHTML = "<p>Пока заказов нет...</p>";
+          }
+        });
+      };
+      if (!localStorage.getItem("password")) {
+        let password;
+        while (!password) {
+          password = prompt("Введите пароль.");
+        }
+        localStorage.setItem("password", password);
+      }
+      const containerGroup = document.querySelector('[data-role="group"]');
+      const containerTransfer = document.querySelector('[data-role="transfer"]');
+      fetch("/admin", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: getFormData(),
+      })
+        .then((res) => res.json())
+        .then((response) => {
+          const res = JSON.parse(response);
+          console.log(res)
+            const {group,transfer} = groupBy(res,'type');
+            containerGroup.innerHTML = group?.length > 0 ? group.map(
+              (obj) => {
+                
+            const dateObj = new Date(obj.date);
+            const daysLeft = 16 - Math.ceil((new Date() - dateObj) / 8.64e7);
+            return `
+                <div data-id="${obj.id}">
+                    <span>Никнейм:</span>
+                    <h3>${obj.username}</h3>
+                    <p>Заплачено рублей: ${obj.amount}₽</p><p>Заказ сделан ${`${dateObj.getDate()}.${dateObj.getMonth() + 1}.${dateObj.getFullYear()}, ${dateObj.getHours()}:${dateObj.getMinutes()}`}</p>
+                    <p>Робуксов отправить: ${obj.amountOfRobux} : ${obj.times} раз по ${obj.optimal}</p><p>Отправка доступна${daysLeft > 0 ? ` через ${16 - Math.ceil((new Date() - dateObj) / 8.64e7)} дней` : ''}</p>
+                    ${obj.hasPromocode ? '<p>Использован промокод</p>' : ''}
+                    <div style="display:flex">
+                        <button onclick="toggleDone('${obj.id}')" data-done="${
+                obj.done
+              }">${obj.done ? "🕒" : "✅"}</button>
+                        <button onclick="deleteOrder('${obj.id}')">🗑️</button>
+
+                        ${daysLeft <= 0 && !obj.done ?  `<button class="sendrobuxes" onclick="sendRobuxes(${obj.id})">💰</button>` : ''}
+                    </div>
+                </div>
+                `}
+            )
+          : "<p>Пока заказов нет...</p>";
+          containerTransfer.innerHTML = transfer?.length > 0 ? transfer.map(
+              (obj) => `
+                <div data-id="${obj.id}">
+                    <span>Никнейм:</span>
+                    <h3>${obj.username}</h3>
+                    <p>Заплачено рублей: ${obj.amount}₽</p>
+                    <p>Робуксов отправить: ${obj.amountOfRobux} : ${obj.times} раз по ${obj.optimal}</p>
+                    ${obj.hasPromocode ? '<p>Использован промокод</p>' : ''}
+                    <div style="display:flex">
+                        <button onclick="toggleDone('${obj.id}')" data-done="${
+                obj.done
+              }">${obj.done ? "🕒" : "✅"}</button>
+                        <button onclick="deleteOrder('${obj.id}')">🗑️</button>
+                        <button onclick="copyLink(${obj.placeID})">🔗</button>
+                    </div>
+                </div>
+                `
+            )
+          : "<p>Пока заказов нет...</p>";
+          
+        });
+      fetch("/admin/config", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: getFormData(),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res);
+          const {promocodes,autoGroup,autoTransfer,...config} = res;
+          let innerConfig = "";
+          for (const [key, value] of Object.entries(config)) {
+            innerConfig += `
+            <div>
+              <label for="${key}">${key}</label>
+              <input id="${key}" type="text" value="${value}"/>
+            </div>
+            `;
+          }
+          document.querySelector('[data-role="config"]').innerHTML = innerConfig;
+          promocodesObj = [...promocodes]
+          let i = 0;
+          let innerPromocodes = ''
+          for(const promocode of promocodes){
+            innerPromocodes += `
+            <div data-id="${i}" data-promocode-value="${promocode.value}">
+              <p>Слово: <input data-type="value" oninput="changePromocode(${i},'value',this.value)" type="text" value="${promocode.value}"/></p>
+              <p>Скидка: <input data-type="discount" oninput="changePromocode(${i},'discount',this.value)" type="text" value="${promocode.discount}"/>%</p>
+              <button onclick="deletePromocode('${promocode.value}')">🗑️</button>
+            </div>
+            `
+            i++
+          }
+          document.querySelector('[data-role="promocodes"]').innerHTML = innerPromocodes;
+          if(autoGroup){
+            document.getElementById('toggleAutoGroup').checked = true;
+          }
+        });
+        document.getElementById('toggleAutoGroup').addEventListener('change',({target})=>{
+          fetch("/admin/togglegroupjobs", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: getFormData(),
+      }).then(res => res.json()).then(res => {
+        iziToast.show({message:'Сохранено.'})
+      })
+        })
+        function changePromocode(id,prop,value){
+         
+          promocodesObj[id][prop] = value;
+         
+            
+          document.getElementById('notSaved').style.display = 'block';
+          
+        }
+        function deletePromocode(value){
+          promocodesObj = promocodesObj.filter(promocode => promocode.value !== value);
+          document.querySelector(`[data-promocode-value="${value}"]`).remove()
+         
+          document.getElementById('notSaved').style.display = 'block';
+        }
+        document.getElementById('addPromocode').addEventListener('click',()=>{
+          const value = prompt('Введите слово:')
+          const discount = prompt('Введите скидку в цифрах от 1 до 100');
+          promocodesObj.push({value,discount});
+          const div = document.createElement('div')
+          div.dataset.promocodeValue = value;
+          div.innerHTML = `<p>Слово: <input type="text" value="${value}"/></p>
+              <p>Скидка: <input type="text" value="${discount}"/>%</p>
+              <button onclick="deletePromocode('${value}')">🗑️</button>`
+              document.querySelector('[data-role="promocodes"]').appendChild(div)
+          document.getElementById('notSaved').style.display = 'block';
+        })
+        document.getElementById('savePromocodes').addEventListener('click',()=>{
+          fetch("/admin/config", {
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: getFormData({ config: {promocodes:promocodesObj} }),
+        }).then(() => {
+          iziToast.show({message:"Сохранено!"});
+          
+          document.getElementById('notSaved').style.display = 'none';
+        });
+        })
+      document.getElementById("saveConfig").addEventListener("click", () => {
+        const arr = {};
+        document
+          .querySelectorAll('[data-role="config"] div')
+          .forEach((elem) => {
+            arr[elem.querySelector("label").innerText] =
+              elem.querySelector("input").value;
+          });
+        fetch("/admin/config", {
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: getFormData({ config: arr }),
+        }).then(() => {
+          iziToast.show({ message:"Сохранено!"});
+        });
+      });
+      const sendRobuxes = (id)=>{
+        fetch("/admin/sendrobuxesgroup", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: getFormData({orderID:id}),
+        }).then(res => res.json()).then(res => {
+          console.log(res)
+          if(res.message === 'ok'){
+
+          iziToast.show({ message:"Робуксы отправлены."});
+          document.querySelector(`[data-id="${id}"] .sendrobuxes`).outerHTML = ''
+          document.querySelector(`[data-id="${id}"] [data-done]`).innerText = '🕒'
+          } else{
+            
+          iziToast.show({ message:"Ошибка"});
+          }
+        });
+      }
+      document.getElementById('notify').addEventListener('click',()=>{
+        fetch("/admin/notify", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: getFormData(),
+        }).then(() => {
+          iziToast.show({ message:"Уведомление отправлено."});
+        });
+      })
+    </script>
+  </body>
+</html>

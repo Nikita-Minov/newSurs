@@ -1,0 +1,595 @@
+function round(value, decimals) { return Number(Math.round(value+'e'+decimals)+'e-'+decimals);}
+
+(async () => {
+  const puppeteer = require("puppeteer");
+
+  const browser = await puppeteer.launch({
+    args: ["--shm-size=1gb",'--no-sandbox','--disable-setuid-sandbox'],
+  });
+  const page = await browser.newPage();
+  await page.goto("https://roblox.com/");
+  await page.setCookie({
+    name: ".ROBLOSECURITY",
+    value:
+      "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_61F2AB9D8F474082F9B75D9FC7E9BAEBC4AB54AD160CECD545DC1661B86E618AFEFEAED7E0896A157347C494E577CB9317E7694CB04FC422D1AC0B6B6BE83AFFC90C80943A32D778392131C15B25310606DB28D9145BE31E15163739DEB4C97D6C391634AA3F2415E29757C90EEE288EC616D12C1C1894189E925BE9A4B2083167ED5975C916E3EB98DF975107AB8F95F5A2A384D07B044AB85A5995AA274121B96C691113234F60B09799A5AA1BD57FE71AF2D15DB832105F539828E365620904C89531CB0AAB9674E818C856DBEB67AF9F84C23F3229C1F84301EE30031CDDA7B8819FCA5D170F25565929A7B439A47A81608EB2CEC9D6078FAB41D50A718504EB3B3855EDB091625B119DF5812F572A96E2DBCF83E731668AA6C9FBDE3363BEE2109CB11F698C260EC0EEB3A4509621E77C91B49048E6F23EDF2D1B581B88FBF2F83F79A0FC1CEB06F35C16A628791A30366F892699153BF3F34C254AF7290C72E793A65CC9C36120BAC2576977914E2F15E4",
+    domain: ".roblox.com",
+    path: "/",
+    secure: true,
+    httpOnly: true,
+    expires: Date.now() + 10 * 365 * 24 * 60 * 60,
+    session: false,
+  });
+  await page.close();
+
+  const { PAYOK } = require("payok");
+  const payok = new PAYOK({
+    secretKey: "d71b89dde88d6b6fb6cf2b3483c89728",
+    shop: 2247,
+  });
+  const hookcord = require("hookcord");
+  const Hook = new hookcord.Hook();
+  Hook.login(
+    "1010970674367566060",
+    "A6Oc3Uk8Dd9nfEzNb2hgSC-V3akWNAdZFLnR1KhFaRVxROK1hDGOQaelYTzyYYljqmkM"
+  );
+
+  const NotifyHook = new hookcord.Hook();
+
+  NotifyHook.login(
+    "1010980697760071680",
+    "KdV86YwG_2AKHKxHHcnGDgaYvaNRmsVL2U-aAKx0JXiB6fLJdtQBKhCk5MAi7gqjKvdA"
+  );
+  /*const notifyHook = new Webhook('https://discord.com/api/webhooks/1010980697760071680/KdV86YwG_2AKHKxHHcnGDgaYvaNRmsVL2U-aAKx0JXiB6fLJdtQBKhCk5MAi7gqjKvdA')
+notifyHook.setUsername('Новые поступления')
+notifyHook.setAvatar('')*/
+  const fetch = require("node-fetch");
+  const fs = require("fs");
+  const md5 = require("md5");
+  const url = require("url");
+  const noblox = require("noblox.js");
+  try {
+    noblox.setCookie(
+      "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_61F2AB9D8F474082F9B75D9FC7E9BAEBC4AB54AD160CECD545DC1661B86E618AFEFEAED7E0896A157347C494E577CB9317E7694CB04FC422D1AC0B6B6BE83AFFC90C80943A32D778392131C15B25310606DB28D9145BE31E15163739DEB4C97D6C391634AA3F2415E29757C90EEE288EC616D12C1C1894189E925BE9A4B2083167ED5975C916E3EB98DF975107AB8F95F5A2A384D07B044AB85A5995AA274121B96C691113234F60B09799A5AA1BD57FE71AF2D15DB832105F539828E365620904C89531CB0AAB9674E818C856DBEB67AF9F84C23F3229C1F84301EE30031CDDA7B8819FCA5D170F25565929A7B439A47A81608EB2CEC9D6078FAB41D50A718504EB3B3855EDB091625B119DF5812F572A96E2DBCF83E731668AA6C9FBDE3363BEE2109CB11F698C260EC0EEB3A4509621E77C91B49048E6F23EDF2D1B581B88FBF2F83F79A0FC1CEB06F35C16A628791A30366F892699153BF3F34C254AF7290C72E793A65CC9C36120BAC2576977914E2F15E4"
+    );
+  } catch (err) {}
+  const axios = require("axios");
+  const { JSDOM } = require("jsdom");
+  const express = require("express");
+  const app = express();
+  const server = require("http").createServer(app);
+  const { Server } = require("socket.io");
+  const io = new Server(server);
+  let usersCount = 0;
+
+  let connections = [];
+  io.on("connection", (socket) => {
+    usersCount++;
+    connections.push(socket);
+    io.emit("new", usersCount);
+    socket.on("disconnect", () => {
+      usersCount--;
+      connections = connections.filter(
+        (connection) => connection.id !== socket.id
+      );
+      io.emit("quit", usersCount);
+    });
+  });
+  app.use(express.json());
+  app.use("/files", express.static("files"));
+
+  app.use("/assets", express.static("assets"));
+  app.use("/webfonts", express.static("webfonts"));
+  app.get("/favicon.png", (req, res) =>
+    res.sendFile(__dirname + "/files/favicon.png")
+  );
+  const visibleRoutes = [
+    "/buy",
+    "/success",
+    "/fail",
+    "/faq",
+    "/support",
+    "/my-purchases",
+    "/agreement",
+    "/privacy",
+    "/contacts",
+    "/status",
+    "/en",
+    "/en/buy",
+    "/en/faq",
+    "/en/support",
+    "/en/my-purchases",
+    "/en/agreement",
+    "/en/privacy",
+    "/en/contacts",
+    "/en/status",
+  ];
+
+  for (const route of visibleRoutes) {
+    app.get(route, (req, res) => {
+      res.sendFile(`${__dirname}/pages${route}/index.html`);
+    });
+  }
+  app.get("/group", async (req, res) => {
+    const { groupID } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
+
+    const { name } = await noblox.getGroup(groupID);
+    const logo = await noblox.getLogo(groupID);
+
+    const funds = await noblox.getGroupFunds(groupID);
+    res.json({ logo, name, funds, id: groupID });
+  });
+  app.post("/isingroup", async (req, res) => {
+    const { username } = req.body;
+    if (!/^[a-z_0-9]+$/i.test(username)) return res.json({ ingroup: false });
+    const { groupID } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
+    try {
+      const userID = await noblox.getIdFromUsername(username);
+      const groups = await noblox.getGroups(userID);
+      console.log(groups);
+      res.json({
+        ingroup: groups.findIndex((group) => group.Id == groupID) > -1,
+      });
+    } catch (err) {
+      if (err.message === "User not found") {
+        return res.json({ error: "user not found" });
+      }
+    }
+  });
+  //const toFixedNum = (num) => num.toString().split('.')[1]?.length > 1 ? Math.round(num / 10) * 10 : num;
+  function toFixedNum(value) {
+    return Math.round(value * 10) / 10;
+  }
+
+  app.get("/statistics", async (req, res) => {
+    const {
+      availableRobux: available,
+      groupID,
+      exchangeRate,
+      dollarExchangeRate,
+      groupExchangeRate,
+    } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
+
+    const groupAvailable = await noblox.getGroupFunds(groupID);
+    const file = JSON.parse(fs.readFileSync(__dirname + "/orders.json"));
+    let selled = 0;
+    file.forEach((obj) => (selled += obj.amountOfRobux));
+    res.json({
+      available: toFixedNum(available),
+      selled: toFixedNum(selled),
+      online: usersCount,
+      exchangeRate,
+      groupAvailable: toFixedNum(groupAvailable),
+      groupExchangeRate,
+      dollarExchangeRate,
+    });
+  });
+  app.get("/lastorders", (req, res) => {
+    let file = JSON.parse(fs.readFileSync(__dirname + "/orders.json"));
+    const { ordersLineLimit } = JSON.parse(
+      fs.readFileSync(__dirname + "/config.json")
+    );
+    const result = file
+      .slice(-ordersLineLimit)
+      .map((obj, index) => {
+        const username =
+          obj.username.length > 7
+            ? obj.username.substring(0, 3) +
+              "*".repeat(obj.username.length - 6) +
+              obj.username.substr(obj.username.length - 3)
+            : "*".repeat(obj.username.length);
+        const amountOfRobux = toFixedNum(obj.amountOfRobux);
+        return {
+          username,
+          amountOfRobux,
+          type: obj.type,
+        };
+      })
+      .reverse();
+    res.json({ result });
+  });
+  app.get("/ss", async (req, res) => {
+    const page = await axios.get(
+      `https://www.roblox.com/games/7216249808/Join-to-the-SCD-Clothing`
+    );
+    res.end(page.data);
+  });
+  app.post("/isrightprice", async (req, res) => {
+    const { id, expected_price } = req.body;
+    const page = await browser.newPage();
+
+    await page.goto(`https://www.roblox.com/games/${id}`);
+    const cookies = cookies()
+    await page.waitForSelector(".text-robux").then(async () => {
+      const price = await page.$eval(
+        ".text-robux",
+        (element) => element.innerText
+      );
+      await page.close();
+      res.json({ isRightPrice: expected_price === Number(price) });
+    });
+  });
+  app.get("/processbuy", (req, res) => {
+    const id = new Date().getTime();
+    const { shopID, shopToken } = JSON.parse(
+      fs.readFileSync(__dirname + "/config.json")
+    );
+    const data = {};
+    data.amount = req.query.amount;
+    data.payment = String(id);
+    data.shop = shopID;
+    data.currency = "RUB";
+    data.desc = "Робуксы";
+    data.secret = shopToken;
+    const arr = [];
+    for (const value of Object.values(data)) {
+      arr.push(value);
+    }
+    delete data.secret;
+    delete req.query.amount;
+    const prepared = arr.join("|");
+    res.redirect(
+      url.format({
+        pathname: "https://payok.io/pay",
+        query: {
+          ...data,
+          sign: md5(prepared),
+          success_url: "https://rbxsell.ru/success",
+          method: "card",
+          username: req.query.username,
+          placeID: req.query.placeID || "none",
+
+          type: req.query.type === "group" ? "group" : "transfer",
+          promocode: req.query.promocode || "none",
+        },
+      })
+    );
+  });
+
+  app.post("/my-purchases", async (req, res) => {
+    const { id } = req.body;
+    const file = JSON.parse(fs.readFileSync(__dirname + "/orders.json"));
+    let purchases = file
+      .filter((obj) => obj.username === id)
+      
+    purchases = await Promise.all(purchases.map(async ({ placeID, amountOfRobux, amount, date, done, type, id }) => {
+      if(type === 'group'){
+        return {
+          amountOfRobux: toFixedNum(amountOfRobux),
+          date,
+          done,
+          type,
+          id,
+        };
+      }  
+      
+      const page = await browser.newPage();
+        await page.goto(`https://www.roblox.com/games/${placeID}`);
+        await page.waitForSelector(".text-robux")
+
+          const price = await page.$eval(
+            ".text-robux",
+            (element) => element.innerText
+          );
+          console.log(price)
+          await page.close();
+          return {
+            amountOfRobux: toFixedNum(amountOfRobux),
+            date,
+            done,
+            type,
+            id,
+            isRightPrice: Number(price) === getPriceWithFee(Math.round(amountOfRobux)),
+          };
+      }));
+      console.log(purchases)
+    res.json({ purchases });
+  });
+  const getOptimalPlacePrice = (robuxNum) => {
+    const robux = Math.floor(robuxNum);
+    if (robux <= 350) return robux;
+
+    const sequence = [...Array(robux + 1).keys()].slice(1);
+    let divisor;
+    for (const num of sequence) {
+      if (robux / num < 350) {
+        divisor = Math.floor(num);
+        break;
+      }
+    }
+    return Math.floor(robux / divisor);
+  };
+  const getPriceWithFee = (price) => {
+    return Math.ceil(price / 0.7);
+  };
+  app.post("/getplace", async (req, res) => {
+    try {
+      const { username, robux } = req.body;
+
+      if (!/^[a-zA-Z_0-9]+$/i.test(username))
+        return res.json({ message: "error" });
+      if (robux % 2 !== 0 || !username) return res.json({ message: "error" });
+      const price = getOptimalPlacePrice(Number(robux));
+      const priceWithFee = getPriceWithFee(price);
+      const userID = await noblox.getIdFromUsername(username);
+      const response = await axios.get(
+        `https://www.roblox.com/users/${userID}/profile#!/creations`
+      );
+      const dom = new JSDOM(response.data);
+      const document = dom.window.document;
+      const placeID = document.querySelector("#games-switcher img").dataset
+        .emblemId;
+      res.json({ price, priceWithFee, fee: priceWithFee - price, placeID });
+    } catch (err) {
+      if (
+        err.message === "Request failed with status code 404" ||
+        err.message === "User not found"
+      ) {
+        return res.json({ message: "user not found" });
+      }
+      res.json({ message: "error" });
+    }
+  });
+  app.post("/checkpromocode", (req, res) => {
+    const { value } = req.body;
+    const { promocodes } = JSON.parse(
+      fs.readFileSync(__dirname + "/config.json")
+    );
+    const object = promocodes.find((obj) => obj.value === value);
+    if (object) {
+      res.json({ exists: true, discount: object.discount });
+    } else {
+      res.json({ exists: false });
+    }
+  });
+  /** Order schema:
+{
+    id: number;
+    done: boolean;
+    nickname: string;
+    amount: number;
+    amountOfRobux: number;
+    hidden: boolean;
+    date: string;
+}
+**/
+  app.post("/payoksuccesspayedhook", async (req, res) => {
+    const { shopToken, promocodes, exchangeRate, groupExchangeRate } =
+      JSON.parse(fs.readFileSync(__dirname + "/config.json"));
+    const file = JSON.parse(fs.readFileSync(__dirname + "/orders.json"));
+    const {
+      desc,
+      currency,
+      shop,
+      payment_id,
+      amount,
+      custom: { username, placeID, type, promocode },
+    } = req.body;
+    const arr = [shopToken, desc, currency, shop, payment_id, amount];
+    const sign = md5(arr.join("|"));
+    if (sign !== req.body.sign) {
+      return res.sendStatus(400);
+    }
+
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, "0");
+    const mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+    const yyyy = today.getFullYear();
+    const date = Date.now();
+    const order = {
+      id: file[file.length - 1]?.id + 1 || 0,
+      done: false,
+      username,
+      placeID: placeID === "none" ? undefined : placeID,
+      amount,
+      amountOfRobux: toFixedNum(
+        amount * (type === "group" ? groupExchangeRate : exchangeRate)
+      ),
+      type,
+      hidden: false,
+      date,
+    };
+    if (promocode !== "none") {
+      const foundPromocode = promocodes.find((obj) => obj.value === promocode);
+      if (foundPromocode) {
+        order.hasPromocode = true;
+        order.amountOfRobux = toFixedNum(
+          order.amountOfRobux / (1 - foundPromocode.discount * 0.01)
+        );
+      }
+    }
+
+    file.push(order);
+    fs.writeFileSync(__dirname + "/orders.json", JSON.stringify(file));
+    const dateObj = new Date(date);
+    const messageContent = `@everyone поступил заказ\nМетод: ${
+      type === "group" ? "Группа" : "Трансфер"
+    }\nЗаплачено: ${amount} RUB\nРобуксов к получению ${
+      order.amountOfRobux
+    } R$\nНикнейм: ${username}\nВремя: ${dateObj.getDate()}.${(
+      "0" +
+      (dateObj.getMonth() + 1)
+    ).slice(-2)}.${dateObj.getFullYear()}, ${dateObj.getHours()}:${(
+      "0" + dateObj.getMinutes()
+    ).slice(-2)}${
+      type === "transfer"
+        ? `Ссылка: https://www.roblox.com/games/${order.placeID}/`
+        : ""
+    }`;
+    Hook.setPayload({
+      content: messageContent,
+    });
+    Hook.fire();
+    res.sendStatus(200);
+  });
+  const adminRoutes = express.Router();
+  const unless = function (middleware) {
+    return function (req, res, next) {
+      if (req.method === "GET") {
+        return next();
+      } else {
+        return middleware(req, res, next);
+      }
+    };
+  };
+  const checkPassword = (req, res, next) => {
+    const { secretPassword } = JSON.parse(
+      fs.readFileSync(__dirname + "/config.json")
+    );
+    if (req.body.password !== secretPassword) {
+      res.sendStatus(403);
+    } else {
+      next();
+    }
+  };
+  adminRoutes.use(unless(checkPassword));
+  adminRoutes.get("/", (req, res) => {
+    res.sendFile(__dirname + "/pages/admin/index.html");
+  });
+  adminRoutes.post("/", (req, res) => {
+    const file = JSON.parse(fs.readFileSync(__dirname + "/orders.json"));
+    res.json(
+      JSON.stringify(
+        file
+          .filter((obj) => !obj.hidden)
+          .map((obj) => {
+            const optimal = getOptimalPlacePrice(obj.amountOfRobux);
+            return {
+              ...obj,
+              optimal,
+              times: Math.floor(obj.amountOfRobux / optimal),
+            };
+          })
+      )
+    );
+  });
+  adminRoutes.post("/toggledone", (req, res) => {
+    const { id } = req.body;
+    const file = JSON.parse(fs.readFileSync(__dirname + "/orders.json"));
+    const config = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
+    const index = file.findIndex((obj) => obj.id === id);
+    if (index === -1) return res.sendStatus(404);
+    const doneToggled = !file[index].done;
+    file[index].done = doneToggled;
+
+    fs.writeFileSync(__dirname + "/orders.json", JSON.stringify(file));
+    res.json({ done: doneToggled });
+  });
+  adminRoutes.post("/notify", async (req, res) => {
+    const dateObj = new Date();
+    const { availableRobux } = JSON.parse(
+      fs.readFileSync(__dirname + "/config.json")
+    );
+    NotifyHook.setPayload({
+      content: `<@&965998309749686272> Завоз робуксов на сайте. Наличие ${availableRobux} R$\nМетод трансфер\nВремя ${dateObj.getDate()}.${(
+        "0" +
+        (dateObj.getMonth() + 1)
+      ).slice(-2)}.${dateObj.getFullYear()}, ${dateObj.getHours()}:${(
+        "0" + dateObj.getMinutes()
+      ).slice(-2)}\nСайт https://rbxsell.ru`,
+    });
+    NotifyHook.fire();
+    res.sendStatus(200);
+  });
+  adminRoutes.delete("/", (req, res) => {
+    const { id } = req.body;
+    let file = JSON.parse(fs.readFileSync(__dirname + "/orders.json"));
+    const index = file.findIndex((obj) => obj.id === id);
+    if (index === -1) return res.sendStatus(404);
+    file[index].hidden = true;
+    fs.writeFileSync(__dirname + "/orders.json", JSON.stringify(file));
+    res.sendStatus(200);
+  });
+  adminRoutes.post("/config", (req, res) => {
+    const file = fs.readFileSync(__dirname + "/config.json");
+    res.json(JSON.parse(file));
+  });
+  adminRoutes.put("/config", (req, res) => {
+    const { config } = req.body;
+    const file = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
+    for (const [key, value] of Object.entries(config)) {
+      file[key] = value;
+    }
+    fs.writeFileSync(__dirname + "/config.json", JSON.stringify(file));
+    res.sendStatus(200);
+  });
+  app.use("/admin", adminRoutes);
+  app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/pages/index.html");
+  });
+  server.listen(3000);
+
+  payok.createWebhook(3002, (payment) => {
+    console.log(payment);
+    /*{
+      payment_id: '51387-77a3-d3724',
+      shop: '2000',
+      amount: '10',
+      profit: '10',
+      desc: 'Описание вашего товара',
+      currency: 'RUB',
+      currency_amount: '10.69',
+      sign: 'b7453a35683171d235dfb13a16b61f41',
+      email: 'email@gmail.ru',
+      date: '11.06.2022 12:13:15',
+      method: 'Qiwi', 
+      custom: { id: '123456' } 
+  }*/
+    const { shopToken, promocodes, exchangeRate, groupExchangeRate } =
+      JSON.parse(fs.readFileSync(__dirname + "/config.json"));
+    const file = JSON.parse(fs.readFileSync(__dirname + "/orders.json"));
+    const {
+      amount,
+      custom: { username, placeID, type, promocode },
+    } = payment;
+    console.log(payment);
+    const today = new Date();
+    const date = Date.now();
+    const order = {
+      id: file[file.length - 1]?.id + 1 || 0,
+      done: false,
+      username,
+      placeID: placeID === "none" ? undefined : placeID,
+      amount,
+      amountOfRobux:
+      round(amount * (type === "group" ? groupExchangeRate : exchangeRate), 0),
+      type,
+      hidden: false,
+      date,
+    };
+    if (promocode !== "none") {
+      const foundPromocode = promocodes.find((obj) => obj.value === promocode);
+      if (foundPromocode) {
+        order.hasPromocode = true;
+        order.amountOfRobux =
+          order.amountOfRobux / (1 - foundPromocode.discount * 0.01);
+      }
+    }
+
+    file.push(order);
+    fs.writeFileSync(__dirname + "/orders.json", JSON.stringify(file));
+
+    const conf = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
+    conf.availableRobux -= order.amountOfRobux;
+
+    fs.writeFileSync(__dirname + "/config.json", JSON.stringify(conf));
+    const dateObj = new Date(date);
+    const messageContent = `@everyone поступил заказ\nМетод: ${
+      type === "group" ? "Группа" : "Трансфер"
+    }\nЗаплачено: ${amount} RUB\nРобуксов к получению ${
+      order.amountOfRobux
+    } R$\nНикнейм: ${username}\nВремя: ${dateObj.getDate()}.${(
+      "0" +
+      (dateObj.getMonth() + 1)
+    ).slice(-2)}.${dateObj.getFullYear()}, ${dateObj.getHours()}:${(
+      "0" + dateObj.getMinutes()
+    ).slice(-2)}${
+      type === "transfer"
+        ? `\nСсылка: https://www.roblox.com/games/${order.placeID}/`
+        : ""
+    }`;
+    Hook.setPayload({
+      content: messageContent,
+    });
+    Hook.fire();
+  });
+})();

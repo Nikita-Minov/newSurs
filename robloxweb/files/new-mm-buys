@@ -1,0 +1,201 @@
+function round(value, decimals) { return Number(Math.round(value+'e'+decimals)+'e-'+decimals);}
+var goBuyAndLock = 0;
+
+$(document).delegate(
+  "#rx_gp_rubbles, #rx_gp_robuxes, #rx_lp_rubbles, #rx_lp_robuxes, #rx_tf_rubbles, #rx_tf_robuxes",
+  "keydown",
+  function (e) {
+    if (e.key.length == 1 && e.key.match(/[^0-9]/)) {
+      return false;
+    }
+    if (e.key == 0 && $(this).val() == "") {
+      return false;
+    }
+  }
+);
+$(document).delegate("#rx_gp_rubbles", "input", function () {
+  var value = $(this).val();
+  console.log('sjsj')
+  if (value == "") {
+    $("#rx_gp_rubbles_usd").text("0.00");
+    return $("#rx_gp_robuxes").val("");
+  }
+  console.log(course_dollar_usd)
+  $("#rx_gp_robuxes").val(round(course_group_robux * value + course_group_robux * (value / (1 - (promocodeDiscount * 0.01)) * (promocodeDiscount * 0.01)), 2));
+  $("#rx_gp_rubbles_usd").text(round(value / course_dollar_usd, 2).toFixed(2));
+});
+$(document).delegate("#rx_gp_robuxes", "input", function () {
+  var value = $(this).val();
+  if (value == "") {
+    $("#rx_gp_rubbles_usd").text("0.00");
+    return $("#rx_gp_rubbles").val("");
+  }
+  $("#rx_gp_rubbles").val(round(value / course_group_robux - ((value - value * (1 - (promocodeDiscount * 0.01))) / course_group_robux), 0));
+  $("#rx_gp_rubbles_usd").text(
+    round(value / course_group_robux / course_dollar_usd, 2).toFixed(2)
+  );
+});
+$(document).delegate("#rx_tf_rubbles", "input", function () {
+  var value = $(this).val();
+  if (value == "") {
+    return $("#rx_tf_robuxes").val("");
+  }
+  console.log(course_transfer_robux)
+  $("#rx_tf_robuxes").val(Math.round(course_transfer_robux * value, 1));
+});
+$(document).delegate("#rx_tf_robuxes", "input", function () {
+  var value = $(this).val();
+  if (value == "") {
+    return $("#rx_tf_rubbles").val("");
+  }
+  $("#rx_tf_rubbles").val(round(value / course_transfer_robux, 1));
+});
+$(document).delegate("#rx_rm_rubbles", "input", function () {
+  var value = $(this).val();
+  if (value == "") {
+    return $("#rx_tf_robuxes").val("");
+  }
+  $("#rx_rm_robuxes").val(round(course_redeem_robux * value, 0));
+});
+$(document).delegate("#rx_rm_robuxes", "input", function () {
+  var value = $(this).val();
+  if (value == "") {
+    return $("#rx_tf_rubbles").val("");
+  }
+  $("#rx_rm_rubbles").val(round(value / course_redeem_robux, 2));
+});
+$(document).delegate("#rx_lp_rubbles", "input", function () {
+  var value = $(this).val();
+  if (value == "") {
+    return $("#rx_lp_robuxes").val("");
+  }
+  $("#rx_lp_robuxes").val(round(course_logpass_robux * value, 0));
+});
+$(document).delegate("#rx_lp_robuxes", "input", function () {
+  var value = $(this).val();
+  if (value == "") {
+    return $("#rx_lp_rubbles").val("");
+  }
+  $("#rx_lp_rubbles").val(round(value / course_logpass_robux, 2));
+});
+$(document).delegate("#rx_lp_rubbles", "change", function () {
+  var value = $(this).val();
+  if (value == "") {
+    return $("#rx_lp_robuxes").val("");
+  }
+  for (let i = value; i < 22501; i++) {
+    if (getKratono(i) == true) {
+      value = i;
+      break;
+    }
+  }
+  $("#rx_lp_robuxes").val(value);
+  $("#rx_lp_rubbles").val(round(value / course_logpass_robux, 2));
+});
+$(document).delegate("#rx_lp_robuxes", "change", function () {
+  var value = $(this).val();
+  if (value == "") {
+    return $("#rx_lp_rubbles").val("");
+  }
+  for (let i = value; i < 22501; i++) {
+    if (getKratono(i) == true) {
+      value = i;
+      break;
+    }
+  }
+  $("#rx_lp_robuxes").val(value);
+  $("#rx_lp_rubbles").val(round(value / course_logpass_robux, 2));
+});
+function getKratono(num) {
+  var success = false;
+  [400, 800, 1700, 5100, 10000, 22500].forEach((send) => {
+    if (num % send === 0) {
+      success = true;
+    }
+  });
+  return success;
+}
+$(document).delegate("#rx_btn_up", "click", function () {
+  /*var value = Number($('#rx_lp_robuxes').val())+80; $('#rx_lp_robuxes').val(value); value = round80(value);*/ var value =
+    Number($("#rx_lp_robuxes").val()) + 1;
+  for (let i = value; i < 22501; i++) {
+    if (getKratono(i) == true) {
+      value = i;
+      break;
+    }
+  }
+  $("#rx_lp_robuxes").val(value);
+  $("#rx_lp_rubbles").val(round(value / course_logpass_robux, 2));
+});
+$(document).delegate("#rx_btn_down", "click", function () {
+  /*var value = Number($('#rx_lp_robuxes').val())-80; if (value <= 0) { $('#rx_lp_rubbles').val(''); return $('#rx_lp_robuxes').val(''); } $('#rx_lp_robuxes').val(value); value = round80(value);*/ var value =
+    Number($("#rx_lp_robuxes").val()) - 1;
+  if (value <= 0) {
+    $("#rx_lp_rubbles").val("");
+    return $("#rx_lp_robuxes").val("");
+  }
+  for (let i = value; i < 22501; i--) {
+    if (getKratono(i) == true) {
+      value = i;
+      break;
+    }
+  }
+  $("#rx_lp_robuxes").val(value);
+  $("#rx_lp_rubbles").val(round(value / course_logpass_robux, 2));
+});
+$(document).delegate("#rx_gp_username", "input", function () {
+  $("#rx_gp_username_load").html(
+    '<i class="far fa-circle-notch fa-spin fa-fw"></i>'
+  );
+  return false;
+});
+
+$(document).delegate("#buyLogPassNext", "click", function () {
+  $(
+    "#buyLogPass_step1 input, #buyLogPass_step1 textarea, #buyLogPass_step1 button"
+  ).prop("disabled", true);
+  goBuyAndLock = 1;
+  $("#buyLogPass_step1").hide();
+  $("#buyLogPass_step2").show();
+  return false;
+});
+$(document).delegate("#buyLogPassBack", "click", function () {
+  $(
+    "#buyLogPass_step1 input, #buyLogPass_step1 textarea, #buyLogPass_step1 button"
+  ).prop("disabled", false);
+  goBuyAndLock = 0;
+  $("#buyLogPass_step2").hide();
+  $("#buyLogPass_step1").show();
+  return false;
+});
+var intervalAnim;
+var intervalAnimNum = 0;
+
+
+$(document).delegate("#buyGroup", "click", function () {
+  
+  $(this).data("btnhtml", $(this).html());
+  $(this).html('<i class="far fa-circle-notch fa-spin fa-fw"></i>');
+  goBuyAndLock = 1;
+  return false;
+});
+$(document).delegate("#buyRedeem", "click", function () {
+  $("#formBuy input, #formBuy textarea, #formBuy button").prop(
+    "disabled",
+    true
+  );
+  $(this).data("btnhtml", $(this).html());
+  $(this).html('<i class="far fa-circle-notch fa-spin fa-fw"></i>');
+  goBuyAndLock = 1;
+  return false;
+});
+
+$(document).delegate("#buyLogPass", "click", function () {
+  $("#formBuy input, #formBuy textarea, #formBuy button").prop(
+    "disabled",
+    true
+  );
+  $(this).data("btnhtml", $(this).html());
+  $(this).html('<i class="far fa-circle-notch fa-spin fa-fw"></i>');
+  return false;
+});
