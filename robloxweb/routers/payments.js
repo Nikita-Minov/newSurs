@@ -104,11 +104,11 @@ router.post("/gamemoney-notification", async (req, res) => {
 
 	if(!checkDate(info)) {
 		config.release(req.body.project_invoice);
-		res.status(200).json({ ok: true });
+		res.status(200).json({ success: "true" })
 		return autoError(req.body.project_invoice, date, "Робуксы были разрезервированы по истечении 20-и минут.");
 	}
 
-	res.status(200).json({ ok: true });
+	res.status(200).json({ success: "true" });
 
 	//автовыдача
 	const user = new RobloxUser(info.cookie);
@@ -184,6 +184,10 @@ function updateOrder(id) {
 	};
 
 	fs.writeFileSync("./orders.json", JSON.stringify(orders));
+}
+
+function findOrder(id) {
+
 }
 
 module.exports = router;

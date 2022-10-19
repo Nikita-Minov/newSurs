@@ -1434,7 +1434,6 @@
 			checking = true;
 			let c = "a" + Date.now().toString(16);
 			iziToast.info({ message: "Проверяем возможность купить ваш Pass", timeout: false, close: false, class: c });
-			// showByWindow()
 			fetch('https://ipapi.co/json/').then(d => d.json()).then(d => {
 				console.log("IP:" + d.ip);
 				fetch(`/api/can_buy`, {
@@ -1659,12 +1658,47 @@
         width: 40%;
         height: 40%;
         background-color: #27143B!important;
-        right: 30%;
-        bottom: 40%;
+        top: 50%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%);
         z-index: 10001;
         visibility: hidden;
         display: flex;
         justify-content: center;
+
+    }
+    @media screen and (max-width: 1230px) {
+        .pay-window-games {
+            width: 60%;
+        }
+    }
+
+    @media screen and (max-width: 730px) {
+        .pay-window-games {
+            width: 75%;
+        }
+    }
+
+    @media screen and (max-width: 600px) {
+        .pay-window-games {
+            width: 85%;
+            height: 25%;
+        }
+    }
+
+    @media screen and (max-width: 280px) {
+        .pay-window-games {
+            width: 85%;
+            height: 20%;
+        }
+    }
+
+    @media screen and (max-width: 180px) {
+        .pay-window-games {
+            width: 85%;
+            height: 15%;
+        }
     }
     .pay-window-games-wrapper {
         width: 80%;
@@ -1674,12 +1708,30 @@
         flex-direction: column;
     }
 
+    @media screen and (max-width: 600px) {
+        .pay-window-games-wrapper {
+            width: 100%;
+        }
+    }
+
     .pay-window-title {
-        margin-top: 15px;
+        margin-top: 60px;
         margin-bottom: 30px;
         font-size: 22px;
         font-family: 'Roboto', sans-serif;
         color: #ffffff;
+    }
+
+    @media screen and (max-width: 600px) {
+        .pay-window-title {
+            font-size: 16px;
+        }
+    }
+
+    @media screen and (max-width: 400px) {
+        .pay-window-title {
+            font-size: 12px;
+        }
     }
 
     .pay-window-button {
@@ -1691,9 +1743,22 @@
         border: none;
     }
 
+    @media screen and (max-width: 600px) {
+        .pay-window-button {
+            width: 80%;
+            height: 50px;
+        }
+    }
+
     .pay-window-img {
         width: 100%;
         height: 100px;
+    }
+
+    @media screen and (max-width: 600px) {
+        .pay-window-img {
+            height: 50px;
+        }
     }
 
     .close-button {
@@ -1707,10 +1772,19 @@
         background-color: #27143B;
     }
 
+
+    @media screen and (max-width: 600px) {
+        .close-button {
+            left: 81%;
+            width: 20px;
+            height: 20px;
+        }
+    }
+
     .black-wrapper {
         position: fixed;
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         background: rgba(0, 0, 0, 0.7)!important;
         visibility: hidden;
         z-index: 10000;
@@ -1728,6 +1802,7 @@
         width: 30px;
         height: 30px;
     }
+
 
     /* Фактическое всплывающее окно (появляется сверху) */
     .pay-window-games .pay-window-games-text {
@@ -1756,6 +1831,8 @@
         border-style: solid;
         border-color: #555 transparent transparent transparent;
     }
+
+
     .popup {
         position: fixed;
         z-index: 100;
