@@ -311,10 +311,10 @@
                 <h3 class="pay-window-title">
                     Выберите способ оплаты
                 </h3>
-                <button onclick="checkBuy('payok')" class="pay-window-button">
+                <button onclick="tryBuy('payok')" class="pay-window-button">
                     <img class="pay-window-img" src="./assets/images/payok.svg" alt="payok">
                 </button>
-                <button onclick="checkBuy('gamemoney')" class="pay-window-button">
+                <button onclick="tryBuy('gamemoney')" class="pay-window-button">
                     <img class="pay-window-img" src="./assets/images/gamemoney.svg" alt="gamemoney">
                 </button>
             </div>
@@ -1044,7 +1044,7 @@
                                             аккаунт после оплаты
                                         </div>
                                     </div>
-                                    <button class="rx-button-purple w-100" id="buyTransfer" onclick="tryBuy()">
+                                    <button class="rx-button-purple w-100" id="buyTransfer" onclick="showByWindow()">
                                         Подтвердить и купить робуксы
                                     </button>
                                 </div>
@@ -1425,47 +1425,80 @@
 
     let checking = false;
 
-    function tryBuy(){
-        if (!tick.querySelector("i").classList.contains("fa-check-square")) {
-            iziToast.warning({ message: "Поставьте галочку" });
-            return;
-        }
-        if(checking) return;
-        checking = true;
-        let c = "a" + Date.now().toString(16);
-        iziToast.info({ message: "Проверяем возможность купить ваш Pass", timeout: false, close: false, class: c });
-        showByWindow();
+    function tryBuy(payType){
+			if (!tick.querySelector("i").classList.contains("fa-check-square")) {
+				iziToast.warning({ message: "Поставьте галочку" });
+				return;
+			}
+			if(checking) return;
+			checking = true;
+			let c = "a" + Date.now().toString(16);
+			iziToast.info({ message: "Проверяем возможность купить ваш Pass", timeout: false, close: false, class: c });
+			// showByWindow()
+			fetch('https://ipapi.co/json/').then(d => d.json()).then(d => {
+				console.log("IP:" + d.ip);
+				fetch(`/api/can_buy`, {
+					method: "POST",
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({
+						userId,
+						sum: parseInt(document.querySelector("#rx_tf_robuxes").value),
+						rate: exchangeRate,
+						gameId: selectedGameId,
+						username: document.querySelector("#rx_tf_username").value.trim(),
+						ip: d.ip,
+						payType: payType,
+					})
+				}).then(r => r.json()).then(r => {
+					iziToast.hide({}, document.querySelector("." + c));
+					if(!r.ok) return [checking = false, iziToast.error({ message: r.error })];
+					iziToast.success({ message: "Успешно, переводим на оплату" });
+					setTimeout(() => {
+						window.location.href = r.link;
+					}, 1000);
+				}).catch(e => {
+					try{
+						iziToast.hide({}, document.querySelector("." + c));
+					} catch { }
+					checking = false;
+					iziToast.error({ message: "Не удалось проверить возможность. Попробуйте позже" });
+				});
+			});
     }
 
-    async function checkBuy(payType) {
-			const ip = await fetch('https://ipapi.co/json/').then(d => d.json()).then(d => d.ip);
-			console.log("IP:" + ip);
-			fetch(`/api/can_buy`, {
-				method: "POST",
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({
-					userId,
-					sum: parseInt(document.querySelector("#rx_tf_robuxes").value),
-					rate: exchangeRate,
-					gameId: selectedGameId,
-					username: document.querySelector("#rx_tf_username").value.trim(),
-                    ip: ip,
-                    payType,
-				})
-			}).then(r => r.json()).then(r => {
-				iziToast.hide({}, document.querySelector("." + c));
-				if(!r.ok) return [checking = false, iziToast.error({ message: r.error })];
-				iziToast.success({ message: "Успешно, переводим на оплату" });
-				setTimeout(() => {
-				    window.location.href = r.link;
-				}, 1000);
-			}).catch(e => {
-				try{
+    function checkBuy(payType) {
+			fetch('https://ipapi.co/json/').then(d => d.json()).then(d => {
+				console.log("IP:" + d.ip);
+				fetch(`/api/can_buy`, {
+					method: "POST",
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({
+						userId,
+						sum: parseInt(document.querySelector("#rx_tf_robuxes").value),
+						rate: exchangeRate,
+						gameId: selectedGameId,
+						username: document.querySelector("#rx_tf_username").value.trim(),
+						ip: d.ip,
+						payType: "payok",
+					})
+				}).then(r => r.json()).then(r => {
 					iziToast.hide({}, document.querySelector("." + c));
-				} catch { }
-				checking = false;
-				iziToast.error({ message: "Не удалось проверить возможность. Попробуйте позже" });
+					console.log("Here");
+					if(!r.ok) return [checking = false, iziToast.error({ message: r.error })];
+                    console.log("Here1");
+					iziToast.success({ message: "Успешно, переводим на оплату" });
+					setTimeout(() => {
+						window.location.href = r.link;
+					}, 1000);
+				}).catch(e => {
+					try{
+						iziToast.hide({}, document.querySelector("." + c));
+					} catch { }
+					checking = false;
+					iziToast.error({ message: "Не удалось проверить возможность. Попробуйте позже" });
+				});
 			});
+
     }
 
     function selectGame(id) {

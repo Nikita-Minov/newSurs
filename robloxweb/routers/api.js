@@ -106,16 +106,17 @@ router.post("/can_buy", async (req, res) => {
 
 				// updating data
 				.update(
-					`amount:${req.body.sum};ip:${req.body.ip};project:322;type:qiwi;user:${req.body.username};wallet:G53203729768;`
+					`amount:${req.body.sum};ip:${req.body.ip};project:322;project_invoice:${orderId};type:qiwi;user:${req.body.username};wallet:G53203729768;`
 				)
 
 				// Encoding to be used
 				.digest('hex');
-			const dataParams = `project=322&type=qiwi&user=${req.body.username}&ip=${req.body.ip}&amount=${req.body.sum}&wallet=G53203729768&signature=${hash}`;
+			const dataParams = `project=322&type=qiwi&user=${req.body.username}&ip=${req.body.ip}&amount=${req.body.sum}&wallet=G53203729768&project_invoice=${orderId}&signature=${hash}`;
+			console.log(dataParams);
 
 		 	await axios.post('https://paygate.gamemoney.com/terminal/create', dataParams)
 				.then(data => {
-					res.status(200).json({ ok: true, orderId, link: data.link});
+					res.status(200).json({ ok: true, orderId, link: data.data.url});
 				})
 				.catch(err => {
 					console.log(err);
