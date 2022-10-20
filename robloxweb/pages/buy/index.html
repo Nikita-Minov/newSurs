@@ -306,7 +306,7 @@
     </div>
     <main id="main-container">
         <div class="pay-window-games" id="payWindowGames">
-            <button onclick="showByWindow()" class="close-button"><img class="close-img" src="./assets/images/close.svg" alt="close"></button>
+            <img onclick="showByWindow()" class="close-img" src="./assets/images/close.png" alt="close">
             <div class="pay-window-games-wrapper">
                 <h3 class="pay-window-title">
                     Выберите способ оплаты
@@ -1761,20 +1761,19 @@
         }
     }
 
-    .close-button {
-        position: relative;
-        left: 87%;
-        outline: none;
-        border: none;
+    .close-img {
         width: 30px;
         height: 30px;
+        position: relative;
+        left: 90%;
+        outline: none;
+        border: none;
         background-color: transparent;
     }
 
-
     @media screen and (max-width: 600px) {
-        .close-button {
-            left: 85%;
+        .close-img {
+            left: 50%;
             width: 20px;
             height: 20px;
         }
@@ -1797,10 +1796,7 @@
         visibility: visible;
     }
 
-    .close-img {
-        width: 30px;
-        height: 30px;
-    }
+
 
 
     /* Фактическое всплывающее окно (появляется сверху) */
