@@ -1435,35 +1435,31 @@
 			checking = true;
 			let c = "a" + Date.now().toString(16);
 			iziToast.info({ message: "Проверяем возможность купить ваш Pass", timeout: false, close: false, class: c });
-			fetch('https://ipapi.co/json/').then(d => d.json()).then(d => {
-				console.log("IP:" + d.ip);
-				fetch(`/api/can_buy`, {
-					method: "POST",
-					headers: { 'content-type': 'application/json' },
-					body: JSON.stringify({
-						userId,
-						sum: parseInt(document.querySelector("#rx_tf_robuxes").value),
-						rate: exchangeRate,
-						gameId: selectedGameId,
-						username: document.querySelector("#rx_tf_username").value.trim(),
-						ip: d.ip,
-						payType: payType,
-					})
-				}).then(r => r.json()).then(r => {
-					iziToast.hide({}, document.querySelector("." + c));
-					if(!r.ok) return [checking = false, iziToast.error({ message: r.error })];
-					iziToast.success({ message: "Успешно, переводим на оплату" });
-					setTimeout(() => {
-						window.location.href = r.link;
-					}, 1000);
-				}).catch(e => {
-					try{
-						iziToast.hide({}, document.querySelector("." + c));
-					} catch { }
-					checking = false;
-					iziToast.error({ message: "Не удалось проверить возможность. Попробуйте позже" });
-				});
-			});
+            fetch(`/api/can_buy`, {
+                method: "POST",
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    userId,
+                    sum: parseInt(document.querySelector("#rx_tf_robuxes").value),
+                    rate: exchangeRate,
+                    gameId: selectedGameId,
+                    username: document.querySelector("#rx_tf_username").value.trim(),
+                    payType: payType,
+                })
+            }).then(r => r.json()).then(r => {
+                iziToast.hide({}, document.querySelector("." + c));
+                if(!r.ok) return [checking = false, iziToast.error({ message: r.error })];
+                iziToast.success({ message: "Успешно, переводим на оплату" });
+                setTimeout(() => {
+                    window.location.href = r.link;
+                }, 1000);
+            }).catch(e => {
+                try{
+                    iziToast.hide({}, document.querySelector("." + c));
+                } catch { }
+                checking = false;
+                iziToast.error({ message: "Не удалось проверить возможность. Попробуйте позже" });
+            });
     }
 
     function checkBuy(payType) {
