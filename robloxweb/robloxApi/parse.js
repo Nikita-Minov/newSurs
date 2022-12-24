@@ -10,6 +10,8 @@ module.exports = {
     async fetchGames(id) {
         let result = await axios.get(`https://games.roblox.com/v2/users/${id}/games?accessFilter=Public&limit=10`).catch(e => {});
         if(!result?.data?.data) return { ok: false };
+				const passes = await this.fetchPasses(id);
+				console.log(passes);
         return { ok: true, data: result.data.data };
     },
     async fetchPasses(id) {

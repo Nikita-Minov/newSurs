@@ -1,4 +1,3 @@
-const config = require("./config");
 const schedule = require("node-schedule");
 const updateBalances = require("./updateBalances");
 

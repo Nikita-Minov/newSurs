@@ -88,6 +88,12 @@ router.post("/gamemoney-notification", async (req, res) => {
 	if(!info) return res.status(200).json({ ok: true });
 
 	let date = new Date();
+
+	const order = findOrder(req.body.project_invoice);
+	if(order.length > 0) {
+		return res.status(200).json({ok: true});
+	}
+
 	saveOrder({ id: req.body.project_invoice, done: false, userID: info.userId, username: info.username, placeID: info.gameId, amount: req.body.amount, amountOfRobux: Math.floor(info.sum / 100 * 70), type: "transfer", hidden: false, date: date.getTime() });
 
 	console.log("Вывод в дс"+ JSON.stringify(req.body));
@@ -187,7 +193,9 @@ function updateOrder(id) {
 }
 
 function findOrder(id) {
-
+	let orders = JSON.parse(fs.readFileSync("./orders.json"));
+	let foundOrder = orders.filter(e => e.id == id);
+	return foundOrder;
 }
 
 module.exports = router;

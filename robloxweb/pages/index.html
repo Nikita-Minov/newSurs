@@ -53,10 +53,6 @@
     <meta name="robots" content="all" />
     <title>rbxsell.ru — Покупка робуксов для тебя и друзей</title>
     <meta
-      name="description"
-      content="На нашем сайте вы можете купить робуксы! Мы предлагаем очень выгодные цены на покупку различными методами. RBXsell лучший сайт по продаже игровой валюты!"
-    />
-    <meta
       name="keywords"
       content="купить робуксы, купить робаксы, магазин робуксов, покупка дешевых робуксов, покупка робуксов по выгодной цене"
     />
@@ -66,14 +62,6 @@
     <meta
       property="og:title"
       content="rbxsell.ru — Покупка робуксов для тебя и друзей"
-    />
-    <meta
-      property="og:site_name"
-      content="rbxsell.ru — Покупка робуксов для тебя и друзей"
-    />
-    <meta
-      property="og:description"
-      content="На нашем сайте вы можете купить робуксы! Мы предлагаем очень выгодные цены на покупку различными методами. RBXsell лучший сайт по продаже игровой валюты!"
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://rbxsell.ru/" />
@@ -676,6 +664,9 @@
       });
     </script>
     <script>
+        let numberWithPoints = (x) => {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
       let _upd = () => fetch("/api/stats").then(r => r.json()).then(r => {
         document.querySelectorAll(".updateStatsBalanceAll").forEach((elem) => {
                   elem.innerText = r.allRobux;
@@ -687,7 +678,7 @@
         .then((res) => res.json())
         .then((res) => {
 
-          document.querySelector(".updateStatsAll").innerText = res.selled;
+          document.querySelector(".updateStatsAll").innerText = numberWithPoints(res.selled);
           document.querySelector(".updateStatsOnline").innerText =
             res.online + 1;
           document.querySelector(".updateCourseTransfer").innerText =

@@ -13,6 +13,7 @@ class Config {
 
     set cookies(value) {
         cs = value;
+				console.log(JSON.stringify(cs));
         fs.writeFileSync("./cookies.json", JSON.stringify(this.cookies));
     }
 

@@ -1681,7 +1681,7 @@
         const username = document.getElementById("rx_tf_username").value;
         if(username.trim().length < 1) return iziToast.error({ message: "Укажите username" });
         if(document.querySelector("#rx_tf_robuxes").value.trim().includes(".")) return iziToast.error({ message: "Количество R$ должно быть целым числом" });
-        if(parseInt(document.querySelector("#rx_tf_robuxes").value) < 25) return iziToast.error({ message: "Укажите количество R$. Минимальная сумма 10 руб." });
+        if(parseInt(document.querySelector("#rx_tf_robuxes").value) < 22) return iziToast.error({ message: "Укажите количество R$. Минимальная сумма 10 руб." });
 
         let c = "a" + Date.now().toString(16);
         iziToast.info({ message: "Ищем ваши игры", timeout: false, close: false, class: c });
